@@ -1,1 +1,875 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>COFFEE CLUB Promo</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-cream: #F9F6F0;
+      --card-bg: #FFFFFF;
+      --primary-espresso: #2B1810;
+      --coffee-brown: #4A2E1B;
+      --caramel-accent: #C88A35;
+      --warm-border: #EFE7DA;
+      --text-muted: #8C7A6B;
+      --success-green: #2E7D32;
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--primary-espresso);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 30px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 18px;
+      position: relative;
+    }
+
+    /* Верхняя панель */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--primary-espresso);
+    }
+
+    .demo-reset-btn {
+      background: rgba(74, 46, 27, 0.08);
+      border: 1px solid var(--warm-border);
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--coffee-brown);
+      cursor: pointer;
+    }
+
+    /* Индикатор прогресса */
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #EAE2D5;
+      border-radius: 99px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--caramel-accent), #E0A95A);
+      transition: width 0.4s ease;
+      border-radius: 99px;
+    }
+
+    /* Экраны */
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* Главный экран действий */
+    .hero-title {
+      font-size: 24px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.4;
+      margin-bottom: 24px;
+      padding: 0 10px;
+    }
+
+    .action-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .action-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--warm-border);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(43, 24, 16, 0.04);
+      transition: transform 0.1s ease, border-color 0.2s ease;
+    }
+
+    .action-card:active {
+      transform: scale(0.98);
+    }
+
+    .action-card.done {
+      border-color: var(--success-green);
+      background: #F4F9F4;
+    }
+
+    .card-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--bg-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .card-texts h4 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .card-texts p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card-status {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid #D0C3B5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .action-card.done .card-status {
+      background: var(--success-green);
+      border-color: var(--success-green);
+      color: #fff;
+    }
+
+    /* Кнопки */
+    .primary-btn {
+      background: linear-gradient(135deg, var(--primary-espresso), var(--coffee-brown));
+      color: #FFF;
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 6px 16px rgba(43, 24, 16, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s ease, transform 0.1s ease;
+    }
+
+    .primary-btn:active {
+      transform: scale(0.98);
+    }
+
+    .primary-btn:disabled {
+      background: #D9D1C7;
+      color: #8C7F72;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .secondary-btn {
+      background: transparent;
+      border: 1.5px solid var(--coffee-brown);
+      color: var(--coffee-brown);
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    /* Экран Колеса */
+    .wheel-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      margin: 20px 0;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 38px;
+      z-index: 10;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 10px 28px rgba(43, 24, 16, 0.16);
+    }
+
+    .spins-badge {
+      background: #EFE4D2;
+      color: var(--coffee-brown);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* Экран ваучера / результата */
+    .voucher-card {
+      background: var(--card-bg);
+      border: 2px dashed var(--caramel-accent);
+      border-radius: 20px;
+      padding: 24px 18px;
+      text-align: center;
+      margin: 20px 0;
+      box-shadow: 0 8px 24px rgba(200, 138, 53, 0.08);
+    }
+
+    .voucher-prize-icon {
+      font-size: 54px;
+      margin-bottom: 8px;
+    }
+
+    .voucher-code-box {
+      background: var(--bg-cream);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--primary-espresso);
+      margin: 14px 0 8px;
+      border: 1px solid var(--warm-border);
+      cursor: pointer;
+    }
+
+    .voucher-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Bottom Sheet (Шторка) */
+    .sheet-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 99;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .sheet-overlay.active {
+      display: flex;
+    }
+
+    .sheet-content {
+      background: #FFF;
+      width: 100%;
+      max-width: 430px;
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 34px;
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+      animation: slideUp 0.25s ease-out forwards;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .sheet-drag-handle {
+      width: 40px;
+      height: 4px;
+      background: #DDD;
+      border-radius: 99px;
+      margin: 0 auto 16px;
+    }
+
+    .demo-footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: #A3968A;
+      margin-top: auto;
+      padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Шапка -->
+    <div class="header">
+      <div class="brand-title">COFFEE CLUB</div>
+      <button class="demo-reset-btn" id="resetBtn">Скинути DEMO</button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- ЭКРАН 1: Список действий -->
+    <div class="screen active" id="screenTasks">
+      <h2 class="hero-title">Секретний подарунок від бариста 🎁</h2>
+      <p class="hero-subtitle">Виконайте дії нижче, щоб розблокувати обертання Колеса Фортуни!</p>
+
+      <div class="action-cards">
+        <div class="action-card" id="cardGoogle">
+          <div class="card-left">
+            <div class="card-icon">⭐️</div>
+            <div class="card-texts">
+              <h4>Залишити відгук у Google</h4>
+              <p>Натисніть для переходу</p>
+            </div>
+          </div>
+          <div class="card-status" id="statusGoogle"></div>
+        </div>
+
+        <div class="action-card" id="cardInstagram">
+          <div class="card-left">
+            <div class="card-icon">◎</div>
+            <div class="card-texts">
+              <h4>Підписатися на Instagram</h4>
+              <p>Натисніть для переходу</p>
+            </div>
+          </div>
+          <div class="card-status" id="statusInstagram"></div>
+        </div>
+      </div>
+
+      <button class="primary-btn" id="btnGoToWheel" disabled>
+        Перейти до Колеса Фортуни 🎡
+      </button>
+
+      <p class="demo-footer-note">DEMO — Google та Instagram працюють як заглушки</p>
+    </div>
+
+    <!-- ЭКРАН 2: Колесо Фортуны -->
+    <div class="screen" id="screenWheel">
+      <div class="wheel-section">
+        <div class="spins-badge" id="spinsLeftBadge">Доступно спінів: 1</div>
+        <h2 class="hero-title">Крутіть Колесо!</h2>
+        <p class="hero-subtitle">Випробуйте удачу та заберіть свій приз на касі</p>
+
+        <div class="wheel-wrapper">
+          <!-- Треугольная стрелка сверху -->
+          <svg class="wheel-pointer" viewBox="0 0 32 38" fill="none">
+            <path d="M16 38L0 6C0 2.68629 2.68629 0 6 0H26C29.3137 0 32 2.68629 32 6L16 38Z" fill="#2B1810"/>
+            <circle cx="16" cy="10" r="5" fill="#C88A35"/>
+          </svg>
+          <canvas id="wheelCanvas" width="640" height="640"></canvas>
+        </div>
+
+        <button class="primary-btn" id="btnSpin">
+          Крутити колесо! 🚀
+        </button>
+      </div>
+    </div>
+
+    <!-- ЭКРАН 3: Результат / Ваучер -->
+    <div class="screen" id="screenResult">
+      <h2 class="hero-title" style="margin-top: 10px;">Вітаємо з виграшем! 🎉</h2>
+      
+      <div class="voucher-card">
+        <div class="voucher-prize-icon" id="voucherIcon">🍪</div>
+        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 6px;" id="voucherTitle">Ви виграли свіже печиво!</h3>
+        <p style="font-size: 13px; color: var(--text-muted);">Покажіть цей персональний код баристі на касі</p>
+        
+        <div class="voucher-code-box" id="voucherCodeBox">COOKIE-8F3K7M2Q</div>
+        <div class="voucher-hint" id="voucherCopyHint">Натисніть на код, щоб скопіювати</div>
+      </div>
+
+      <div id="secondActionPromptBlock" style="margin-top: 10px;">
+        <p style="font-size: 14px; text-align: center; color: var(--coffee-brown); font-weight: 600; margin-bottom: 12px;">
+          Хочете ще один секретний подарунок? 🎁<br/>Виконайте 2-гу дію та розблокуйте +1 спін!
+        </p>
+        <button class="primary-btn" id="btnDoSecondTask">
+          Виконати 2-гу дію ✨
+        </button>
+      </div>
+
+      <button class="secondary-btn" id="btnBackToWheel" style="display: none;">
+        Крутити ще раз 🎡
+      </button>
+
+      <p class="demo-footer-note">Покажіть екран співробітнику каси для отримання призу</p>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet (Модалка подтверждения действия) -->
+  <div class="sheet-overlay" id="sheetOverlay">
+    <div class="sheet-content">
+      <div class="sheet-drag-handle"></div>
+      <h3 style="font-size: 18px; margin-bottom: 8px; font-weight: 800;" id="sheetTitle">Підтвердження дії</h3>
+      <p style="font-size: 14px; color: var(--text-muted); line-height: 1.4; margin-bottom: 22px;" id="sheetDesc">
+        У реальній версії тут відкриється застосунок.
+      </p>
+      <button class="primary-btn" id="sheetConfirmBtn">Я виконав(ла) ✅</button>
+      <button class="secondary-btn" id="sheetCancelBtn">Повернутися</button>
+    </div>
+  </div>
+
+  <script>
+    // Инициализация Telegram WebApp
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      try { tg.enableClosingConfirmation(); } catch(e) {}
+    }
+
+    function haptic(type, style) {
+      if (!tg?.HapticFeedback) return;
+      if (type === 'impact') tg.HapticFeedback.impactOccurred(style || 'medium');
+      if (type === 'notification') tg.HapticFeedback.notificationOccurred(style || 'success');
+    }
+
+    // Идентификация пользователя (TG user id или fallback)
+    const userId = tg?.initDataUnsafe?.user?.id || 'demo_user';
+    const STORAGE_KEY = `coffee_promo_${userId}`;
+
+    // 8 секторов Колеса Фортуны
+    // Сектор 0: Печиво (Target 1)
+    // Сектор 4: Шопер (Target 2)
+    const SECTORS = [
+      { label: "Печиво", icon: "🍪", color: "#4A2E1B", textCol: "#FFF" },
+      { label: "Кава", icon: "☕️", color: "#D29034", textCol: "#FFF" },
+      { label: "Пусто", icon: "💨", color: "#F3ECE0", textCol: "#4A2E1B" },
+      { label: "Круасан", icon: "🥐", color: "#8C542D", textCol: "#FFF" },
+      { label: "Шопер", icon: "👜", color: "#2B1810", textCol: "#FFF" },
+      { label: "-50 грн", icon: "🏷", color: "#E0A95A", textCol: "#2B1810" },
+      { label: "Еспресо", icon: "☕️", color: "#663B1C", textCol: "#FFF" },
+      { label: "Секрет", icon: "✨", color: "#F3ECE0", textCol: "#4A2E1B" }
+    ];
+
+    // Состояние приложения
+    let state = {
+      googleDone: false,
+      instagramDone: false,
+      spinsUsed: 0,
+      vouchers: [] // { prize: 'COOKIE'|'SHOPPER', code: '...' }
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) state = JSON.parse(raw);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function generateCode(prefix) {
+      const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+      let res = "";
+      for (let i = 0; i < 8; i++) {
+        res += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return `${prefix}-${res}`;
+    }
+
+    // DOM Элементы
+    const screenTasks = document.getElementById('screenTasks');
+    const screenWheel = document.getElementById('screenWheel');
+    const screenResult = document.getElementById('screenResult');
+
+    const cardGoogle = document.getElementById('cardGoogle');
+    const cardInstagram = document.getElementById('cardInstagram');
+    const statusGoogle = document.getElementById('statusGoogle');
+    const statusInstagram = document.getElementById('statusInstagram');
+    const btnGoToWheel = document.getElementById('btnGoToWheel');
+    const progressBar = document.getElementById('progressBar');
+
+    const sheetOverlay = document.getElementById('sheetOverlay');
+    const sheetTitle = document.getElementById('sheetTitle');
+    const sheetDesc = document.getElementById('sheetDesc');
+    const sheetConfirmBtn = document.getElementById('sheetConfirmBtn');
+    const sheetCancelBtn = document.getElementById('sheetCancelBtn');
+    let currentSheetTask = null;
+
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const btnSpin = document.getElementById('btnSpin');
+    const spinsLeftBadge = document.getElementById('spinsLeftBadge');
+
+    const voucherIcon = document.getElementById('voucherIcon');
+    const voucherTitle = document.getElementById('voucherTitle');
+    const voucherCodeBox = document.getElementById('voucherCodeBox');
+    const voucherCopyHint = document.getElementById('voucherCopyHint');
+    const secondActionPromptBlock = document.getElementById('secondActionPromptBlock');
+    const btnDoSecondTask = document.getElementById('btnDoSecondTask');
+    const btnBackToWheel = document.getElementById('btnBackToWheel');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let currentRotation = 0; // в радианах
+    let isSpinning = false;
+
+    // Отрисовка Колеса
+    function drawWheel() {
+      const numSectors = SECTORS.length;
+      const arc = (2 * Math.PI) / numSectors;
+      const radius = canvas.width / 2;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.translate(radius, radius);
+      ctx.rotate(currentRotation);
+
+      for (let i = 0; i < numSectors; i++) {
+        const angle = i * arc;
+        ctx.beginPath();
+        ctx.fillStyle = SECTORS[i].color;
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, angle, angle + arc);
+        ctx.lineTo(0, 0);
+        ctx.fill();
+
+        // Разделитель
+        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Текст и эмодзи сектора
+        ctx.save();
+        ctx.rotate(angle + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = SECTORS[i].textCol;
+        ctx.font = "bold 28px -apple-system, sans-serif";
+        ctx.fillText(SECTORS[i].icon, radius - 45, 10);
+        ctx.font = "700 21px -apple-system, sans-serif";
+        ctx.fillText(SECTORS[i].label, radius - 95, 8);
+        ctx.restore();
+      }
+
+      // Центр колеса
+      ctx.beginPath();
+      ctx.arc(0, 0, 48, 0, 2 * Math.PI);
+      ctx.fillStyle = "#FAF6EE";
+      ctx.fill();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#4A2E1B";
+      ctx.stroke();
+
+      ctx.font = "24px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("☕️", 0, 0);
+
+      ctx.restore();
+    }
+
+    function switchScreen(screen) {
+      [screenTasks, screenWheel, screenResult].forEach(s => s.classList.remove('active'));
+      screen.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function updateUI() {
+      const completedCount = (state.googleDone ? 1 : 0) + (state.instagramDone ? 1 : 0);
+      const totalSpinsEarned = completedCount;
+      const spinsAvailable = Math.max(0, totalSpinsEarned - state.spinsUsed);
+
+      // Прогресс бар
+      progressBar.style.width = (completedCount * 50) + "%";
+
+      // Карточки действий
+      if (state.googleDone) {
+        cardGoogle.classList.add('done');
+        statusGoogle.textContent = '✓';
+      } else {
+        cardGoogle.classList.remove('done');
+        statusGoogle.textContent = '';
+      }
+
+      if (state.instagramDone) {
+        cardInstagram.classList.add('done');
+        statusInstagram.textContent = '✓';
+      } else {
+        cardInstagram.classList.remove('done');
+        statusInstagram.textContent = '';
+      }
+
+      btnGoToWheel.disabled = completedCount === 0;
+
+      // Бейдж оставшихся спинов
+      spinsLeftBadge.textContent = `Доступно спінів: ${spinsAvailable}`;
+      btnSpin.disabled = spinsAvailable <= 0;
+
+      // Если оба спина уже откручены
+      if (state.spinsUsed >= 2 && state.vouchers.length >= 2) {
+        renderResult(state.vouchers[state.vouchers.length - 1]);
+        secondActionPromptBlock.style.display = 'none';
+        btnBackToWheel.style.display = 'none';
+        switchScreen(screenResult);
+      }
+    }
+
+    // Открытие шторки для действия
+    function openSheet(type) {
+      haptic('impact', 'light');
+      currentSheetTask = type;
+      if (type === 'google') {
+        sheetTitle.textContent = "Відгук у Google Maps";
+        sheetDesc.textContent = "У реальній версії тут відкриється Google Maps нашої кав'ярні для оцінки та відгуку.";
+      } else {
+        sheetTitle.textContent = "Підписка в Instagram";
+        sheetDesc.textContent = "У реальній версії тут відкриється офіційний профіль COFFEE CLUB в Instagram.";
+      }
+      sheetOverlay.classList.add('active');
+    }
+
+    function closeSheet() {
+      sheetOverlay.classList.remove('active');
+      currentSheetTask = null;
+    }
+
+    cardGoogle.addEventListener('click', () => {
+      if (!state.googleDone) openSheet('google');
+    });
+
+    cardInstagram.addEventListener('click', () => {
+      if (!state.instagramDone) openSheet('instagram');
+    });
+
+    sheetCancelBtn.addEventListener('click', closeSheet);
+    sheetOverlay.addEventListener('click', (e) => {
+      if (e.target === sheetOverlay) closeSheet();
+    });
+
+    sheetConfirmBtn.addEventListener('click', () => {
+      haptic('impact', 'medium');
+      if (currentSheetTask === 'google') state.googleDone = true;
+      if (currentSheetTask === 'instagram') state.instagramDone = true;
+      saveState();
+      closeSheet();
+      updateUI();
+    });
+
+    btnGoToWheel.addEventListener('click', () => {
+      haptic('impact', 'medium');
+      switchScreen(screenWheel);
+      drawWheel();
+    });
+
+    // Логика вращения колеса (Rigged)
+    // 1-й спин -> Сектор 0 (Печиво)
+    // 2-й спин -> Сектор 4 (Шопер)
+    function spinWheel() {
+      if (isSpinning) return;
+      const completedCount = (state.googleDone ? 1 : 0) + (state.instagramDone ? 1 : 0);
+      const available = completedCount - state.spinsUsed;
+      if (available <= 0) return;
+
+      isSpinning = true;
+      btnSpin.disabled = true;
+      haptic('impact', 'heavy');
+
+      // Выбор целевого сектора
+      const targetIndex = (state.spinsUsed === 0) ? 0 : 4;
+      const numSectors = SECTORS.length;
+      const arc = (2 * Math.PI) / numSectors;
+
+      // Стрелка сверху = угол 3 * PI / 2 (270 градусов)
+      const targetCenterAngle = (targetIndex * arc) + (arc / 2);
+      const pointerAngle = 1.5 * Math.PI;
+
+      // Смещение с запасом в 5 полных оборотов
+      const extraRounds = 5;
+      const normalizedCurrent = currentRotation % (2 * Math.PI);
+      let targetAngle = pointerAngle - targetCenterAngle;
+      while (targetAngle < normalizedCurrent) {
+        targetAngle += 2 * Math.PI;
+      }
+      targetAngle += extraRounds * 2 * Math.PI;
+
+      const startAngle = currentRotation;
+      const diff = targetAngle - startAngle;
+      const duration = 3200;
+      const startTime = performance.now();
+
+      function animate(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Плавный Easing (easeOutCubic)
+        const ease = 1 - Math.pow(1 - progress, 3);
+        currentRotation = startAngle + (diff * ease);
+        drawWheel();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          haptic('notification', 'success');
+          finishSpin(targetIndex);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function finishSpin(targetIndex) {
+      state.spinsUsed += 1;
+      let newVoucher;
+
+      if (targetIndex === 0) {
+        newVoucher = { prize: 'COOKIE', code: generateCode('COOKIE') };
+      } else {
+        newVoucher = { prize: 'SHOPPER', code: generateCode('SHOPPER') };
+      }
+
+      state.vouchers.push(newVoucher);
+      saveState();
+      updateUI();
+      renderResult(newVoucher);
+      switchScreen(screenResult);
+    }
+
+    function renderResult(voucher) {
+      if (voucher.prize === 'COOKIE') {
+        voucherIcon.textContent = '🍪';
+        voucherTitle.textContent = 'Ви виграли фірмове печиво!';
+        voucherCodeBox.textContent = voucher.code;
+
+        // Если второе действие ещё не выполнено — предлагаем второй подарок
+        const bothDone = state.googleDone && state.instagramDone;
+        if (!bothDone) {
+          secondActionPromptBlock.style.display = 'block';
+          btnBackToWheel.style.display = 'none';
+        } else if (state.spinsUsed < 2) {
+          secondActionPromptBlock.style.display = 'none';
+          btnBackToWheel.style.display = 'block';
+        } else {
+          secondActionPromptBlock.style.display = 'none';
+          btnBackToWheel.style.display = 'none';
+        }
+      } else {
+        voucherIcon.textContent = '👜';
+        voucherTitle.textContent = 'Ви виграли брендовий шопер!';
+        voucherCodeBox.textContent = voucher.code;
+        secondActionPromptBlock.style.display = 'none';
+        btnBackToWheel.style.display = 'none';
+      }
+    }
+
+    // Копирование кода в буфер
+    voucherCodeBox.addEventListener('click', () => {
+      haptic('impact', 'light');
+      navigator.clipboard.writeText(voucherCodeBox.textContent);
+      voucherCopyHint.textContent = 'Код скопійовано! ✓';
+      setTimeout(() => {
+        voucherCopyHint.textContent = 'Натисніть на код, щоб скопіювати';
+      }, 2000);
+    });
+
+    btnDoSecondTask.addEventListener('click', () => {
+      haptic('impact', 'medium');
+      switchScreen(screenTasks);
+    });
+
+    btnBackToWheel.addEventListener('click', () => {
+      haptic('impact', 'medium');
+      switchScreen(screenWheel);
+      drawWheel();
+    });
+
+    btnSpin.addEventListener('click', spinWheel);
+
+    // Сброс DEMO
+    resetBtn.addEventListener('click', () => {
+      haptic('notification', 'warning');
+      localStorage.removeItem(STORAGE_KEY);
+      state = {
+        googleDone: false,
+        instagramDone: false,
+        spinsUsed: 0,
+        vouchers: []
+      };
+      currentRotation = 0;
+      updateUI();
+      drawWheel();
+      switchScreen(screenTasks);
+    });
+
+    // Старт
+    loadState();
+    updateUI();
+    drawWheel();
+  </script>
+</body>
+</html>
